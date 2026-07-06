@@ -1,0 +1,18 @@
+# JMeter Results
+*.jtl
+
+# Logs
+*.log
+
+# HTML Reports
+reports/
+
+# Result files
+results/
+
+# VS Code
+.vscode/
+
+# Windows
+Thumbs.db
+Desktop.ini
