@@ -4,11 +4,13 @@
 # Logs
 *.log
 
-# HTML Reports
-reports/
+# Ignore generated report contents
+reports/*
+results/*
 
-# Result files
-results/
+# Keep folder structure
+!reports/.gitkeep
+!results/.gitkeep
 
 # VS Code
 .vscode/
