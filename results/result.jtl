@@ -1,0 +1,4 @@
+timeStamp,elapsed,label,responseCode,responseMessage,threadName,dataType,success,failureMessage,bytes,sentBytes,grpThreads,allThreads,URL,Latency,IdleTime,Connect
+1783443362320,669,HTTP Request - /oauth/token,200,OK,setUp Thread Group 1-1,text,true,,1481,710,1,1,https://oauth.cimpress.io/v2/token,665,0,630
+1783443363042,880,HTTP Request - /quotes/v1/create,401,Unauthorized,Thread Group - v1/create 1-1,text,false,,329,9438,1,1,https://stage-backbone.abc.cimpress.io/quotes/v1/create,880,0,653
+1783443363953,233,HTTP Request - v1/:quoteId/add-custom-items,401,Unauthorized,Thread Group - v1/create 1-1,text,false,,329,1341,1,1,https://stage-backbone.abc.cimpress.io/quotes/v1/NOT_FOUND/add-custom-items,233,0,0

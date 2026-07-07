@@ -1,12 +1,18 @@
 # JMeter Results
 *.jtl
+!results/**/*.jtl
 
 # Logs
 *.log
+!results/**/*.log
 
-# Ignore generated report contents
+# Keep generated report and result folders trackable
 reports/*
+!reports/
+!reports/**
 results/*
+!results/
+!results/**
 
 # Keep folder structure
 !reports/.gitkeep
