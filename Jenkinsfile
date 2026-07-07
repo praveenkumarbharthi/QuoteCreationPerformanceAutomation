@@ -25,15 +25,15 @@ pipeline {
     }
 
     environment {
-        JMETER_HOME        = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
-        RESULTS_DIR        = "${WORKSPACE}\\results"
-        REPORTS_DIR        = "${WORKSPACE}\\reports\\html"
-        ERROR_THRESHOLD    = '1'
+        JMETER_HOME       = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
+        RESULTS_DIR       = "${WORKSPACE}\\results"
+        REPORTS_DIR       = "${WORKSPACE}\\reports\\html"
+        AI_REPORT_DIR     = "${WORKSPACE}\\reports\\ai"
+        ERROR_THRESHOLD   = '1'
         RESPONSE_THRESHOLD = '5000'
     }
 
     stages {
-
         stage('Checkout Source') {
             steps {
                 checkout scm
@@ -49,7 +49,7 @@ pipeline {
         stage('Run Performance Test') {
             steps {
                 bat """
-                    scripts\\runJmeter.bat
+                scripts\\runJmeter.bat
                 """
             }
         }
@@ -59,13 +59,27 @@ pipeline {
                 script {
                     def jtlFile = "${WORKSPACE}\\results\\result.jtl"
                     echo "Checking performance thresholds against result.jtl..."
-                    echo "Error threshold  : ${ERROR_THRESHOLD}%"
+                    echo "Error threshold : ${ERROR_THRESHOLD}%"
                     echo "Response threshold: ${RESPONSE_THRESHOLD} ms"
                     echo "Threshold check stage complete - review Statistics in HTML report."
                 }
             }
         }
 
+        stage('AI Performance Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')]) {
+                    bat """
+                    set JTL_PATH=%WORKSPACE%\\results\\result.jtl
+                    set AI_REPORT_PATH=%WORKSPACE%\\reports\\ai\\index.html
+                    set ENVIRONMENT=${params.ENVIRONMENT}
+                    set BUILD_NUMBER=${env.BUILD_NUMBER}
+                    set GEMINI_API_KEY=%GEMINI_API_KEY%
+                    python scripts\\ai_analyze.py
+                    """
+                }
+            }
+        }
     }
 
     post {
@@ -78,6 +92,14 @@ pipeline {
                 reportDir            : 'reports/html',
                 reportFiles          : 'index.html',
                 reportName           : 'JMeter HTML Report'
+            ])
+            publishHTML(target: [
+                allowMissing         : true,
+                alwaysLinkToLastBuild: true,
+                keepAll              : true,
+                reportDir            : 'reports/ai',
+                reportFiles          : 'index.html',
+                reportName           : 'AI Performance Report'
             ])
         }
         success {
