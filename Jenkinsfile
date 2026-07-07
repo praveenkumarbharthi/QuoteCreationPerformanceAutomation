@@ -1,12 +1,10 @@
 pipeline {
+
     agent any
 
-    // environment {
-    //     JMETER_HOME = 'C:\\Users\\Praveen_Kumar\\Desktop\\Jmeter\\apache-jmeter-5.6.3'
-    // }
     environment {
-    JMETER_HOME = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
-}
+        JMETER_HOME = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
+    }
 
     stages {
 
@@ -16,41 +14,37 @@ pipeline {
             }
         }
 
-        stage('Verify JMeter') {
+        stage('Verify JMeter Installation') {
             steps {
                 bat '"%JMETER_HOME%\\bin\\jmeter.bat" --version'
             }
         }
 
-        stage('Run JMeter Test') {
+        stage('Run Performance Test') {
             steps {
-                bat '''
-                if not exist results mkdir results
-                if not exist reports mkdir reports
-
-                "%JMETER_HOME%\\bin\\jmeter.bat" ^
-                -n ^
-                -t jmeter\\createQuote.jmx ^
-                -l results\\result.jtl ^
-                -e ^
-                -o reports\\html
-                '''
+                bat 'scripts\\runJmeter.bat'
             }
         }
+
     }
 
     post {
+
         always {
+
             archiveArtifacts artifacts: 'results/*.jtl', fingerprint: true
 
             publishHTML(target: [
-                allowMissing: false,
+                allowMissing: true,
                 alwaysLinkToLastBuild: true,
                 keepAll: true,
                 reportDir: 'reports/html',
                 reportFiles: 'index.html',
                 reportName: 'JMeter HTML Report'
             ])
+
         }
+
     }
+
 }
