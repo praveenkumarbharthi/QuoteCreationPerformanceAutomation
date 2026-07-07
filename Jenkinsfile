@@ -1,5 +1,4 @@
 pipeline {
-
     agent any
 
     environment {
@@ -7,10 +6,19 @@ pipeline {
     }
 
     stages {
-
         stage('Checkout Source') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Fix Jenkins CSP') {
+            steps {
+                script {
+                    System.setProperty('hudson.model.DirectoryBrowserSupport.CSP',
+                        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                        "style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:;")
+                }
             }
         }
 
@@ -25,14 +33,11 @@ pipeline {
                 bat 'scripts\\runJmeter.bat'
             }
         }
-
     }
 
     post {
-
         always {
-
-archiveArtifacts artifacts: 'results/*', fingerprint: true
+            archiveArtifacts artifacts: 'results/**, reports/**', fingerprint: true
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,
@@ -41,9 +46,6 @@ archiveArtifacts artifacts: 'results/*', fingerprint: true
                 reportFiles: 'index.html',
                 reportName: 'JMeter HTML Report'
             ])
-
         }
-
     }
-
 }
