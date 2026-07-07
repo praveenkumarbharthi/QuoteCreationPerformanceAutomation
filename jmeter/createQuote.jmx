@@ -188,7 +188,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
           <hashTree/>
         </hashTree>
       </hashTree>
-      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group - v1/create">
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group - v1/create" enabled="true">
         <intProp name="ThreadGroup.num_threads">1</intProp>
         <intProp name="ThreadGroup.ramp_time">1</intProp>
         <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
@@ -199,7 +199,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
         </elementProp>
       </ThreadGroup>
       <hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - /quotes/v1/create">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - /quotes/v1/create" enabled="true">
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.path">/quotes/v1/create</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -417,7 +417,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="" elementType="Header">
                 <stringProp name="Header.name">x-abc-workspace</stringProp>
@@ -438,7 +438,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
             </collectionProp>
           </HeaderManager>
           <hashTree/>
-          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - quoteId">
+          <JSONPostProcessor guiclass="JSONPostProcessorGui" testclass="JSONPostProcessor" testname="JSON Extractor - quoteId" enabled="true">
             <stringProp name="JSONPostProcessor.referenceNames">quoteId</stringProp>
             <stringProp name="JSONPostProcessor.jsonPathExprs">$.quoteId</stringProp>
             <stringProp name="JSONPostProcessor.match_numbers">1</stringProp>
@@ -460,7 +460,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
           </JSONPostProcessor>
           <hashTree/>
         </hashTree>
-        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - v1/:quoteId/add-custom-items">
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request - v1/:quoteId/add-custom-items" enabled="true">
           <stringProp name="HTTPSampler.protocol">https</stringProp>
           <stringProp name="HTTPSampler.path">/quotes/v1/${quoteId}/add-custom-items</stringProp>
           <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
@@ -507,7 +507,7 @@ log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
           </elementProp>
         </HTTPSamplerProxy>
         <hashTree>
-          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager" enabled="true">
             <collectionProp name="HeaderManager.headers">
               <elementProp name="x-abc-workspace" elementType="Header">
                 <stringProp name="Header.name">x-abc-workspace</stringProp>
