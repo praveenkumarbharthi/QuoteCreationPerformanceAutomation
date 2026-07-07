@@ -32,8 +32,7 @@ pipeline {
 
         always {
 
-            archiveArtifacts artifacts: 'results/*.jtl', fingerprint: true
-
+archiveArtifacts artifacts: 'results/*', fingerprint: true
             publishHTML(target: [
                 allowMissing: true,
                 alwaysLinkToLastBuild: true,

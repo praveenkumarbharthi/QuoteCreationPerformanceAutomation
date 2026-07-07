@@ -5,16 +5,15 @@ echo Running JMeter Performance Test
 echo ==========================================
 
 REM Create folders if they don't exist
-
 if not exist results mkdir results
 if not exist reports mkdir reports
 
 REM Execute JMeter
-
 jmeter\apache-jmeter-5.6.3\bin\jmeter.bat ^
 -n ^
 -t jmeter\createQuote.jmx ^
 -l results\result.jtl ^
+-j results\jmeter.log ^
 -e ^
 -o reports\html
 
