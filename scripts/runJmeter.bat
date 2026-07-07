@@ -4,11 +4,18 @@ echo ==========================================
 echo Running JMeter Performance Test
 echo ==========================================
 
-REM Create folders if they don't exist
-if not exist results mkdir results
-if not exist reports mkdir reports
+REM Delete previous report
+if exist reports rmdir /S /Q reports
+
+REM Delete previous results
+if exist results rmdir /S /Q results
+
+REM Create folders
+mkdir reports
+mkdir results
 
 REM Execute JMeter
+
 jmeter\apache-jmeter-5.6.3\bin\jmeter.bat ^
 -n ^
 -t jmeter\createQuote.jmx ^
