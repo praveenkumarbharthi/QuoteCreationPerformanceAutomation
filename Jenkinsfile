@@ -1,9 +1,12 @@
 pipeline {
     agent any
 
+    // environment {
+    //     JMETER_HOME = 'C:\\Users\\Praveen_Kumar\\Desktop\\Jmeter\\apache-jmeter-5.6.3'
+    // }
     environment {
-        JMETER_HOME = 'C:\\Users\\Praveen_Kumar\\Desktop\\Jmeter\\apache-jmeter-5.6.3'
-    }
+    JMETER_HOME = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
+}
 
     stages {
 
