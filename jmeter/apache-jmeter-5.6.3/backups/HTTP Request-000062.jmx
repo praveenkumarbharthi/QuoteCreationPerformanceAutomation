@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Test Plan">
+      <boolProp name="TestPlan.serialize_threadgroups">true</boolProp>
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <Arguments guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments">
+          <elementProp name="base_url" elementType="Argument">
+            <stringProp name="Argument.name">base_url</stringProp>
+            <stringProp name="Argument.value">wallet-int.ecommerce.cimpress.io</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="scheme" elementType="Argument">
+            <stringProp name="Argument.name">scheme</stringProp>
+            <stringProp name="Argument.value">https</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+          <elementProp name="project_key" elementType="Argument">
+            <stringProp name="Argument.name">project_key</stringProp>
+            <stringProp name="Argument.value">reward-wallet-load-test</stringProp>
+            <stringProp name="Argument.metadata">=</stringProp>
+          </elementProp>
+        </collectionProp>
+      </Arguments>
+      <hashTree/>
+      <ConfigTestElement guiclass="HttpDefaultsGui" testclass="ConfigTestElement" testname="HTTP Request Defaults" enabled="true">
+        <stringProp name="HTTPSampler.domain">www.example.com</stringProp>
+        <stringProp name="HTTPSampler.protocol">https</stringProp>
+        <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+          <collectionProp name="Arguments.arguments"/>
+        </elementProp>
+        <stringProp name="HTTPSampler.implementation"></stringProp>
+      </ConfigTestElement>
+      <hashTree/>
+      <CookieManager guiclass="CookiePanel" testclass="CookieManager" testname="HTTP Cookie Manager" enabled="true">
+        <collectionProp name="CookieManager.cookies"/>
+        <boolProp name="CookieManager.clearEachIteration">false</boolProp>
+        <boolProp name="CookieManager.controlledByThreadGroup">false</boolProp>
+      </CookieManager>
+      <hashTree/>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>false</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>false</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>true</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <hostname>true</hostname>
+            <threadCounts>true</threadCounts>
+            <sampleCount>true</sampleCount>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group - Token">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="/oauth/token">
+          <stringProp name="HTTPSampler.domain">oauth.cimpress.io</stringProp>
+          <stringProp name="HTTPSampler.port">443</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.contentEncoding">UTF-8</stringProp>
+          <stringProp name="HTTPSampler.path">/v2/token</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="client_secret" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">0878dd512d96af4ba37432a870894a3589f9c98d0406441c1eae5a6baac32257f36abf651b0999e9e9b374efb6d8a81b81ec858ea151e30c91bcb6c6614f736a</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">client_secret</stringProp>
+              </elementProp>
+              <elementProp name="grant_type" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">client_credentials</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">grant_type</stringProp>
+              </elementProp>
+              <elementProp name="audience" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">https://api.cimpress.io/</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">audience</stringProp>
+              </elementProp>
+              <elementProp name="client_id" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">18c407e84d8b025872794736ee3a7251</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+                <boolProp name="HTTPArgument.use_equals">true</boolProp>
+                <stringProp name="Argument.name">client_id</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="Content-Type" elementType="Header">
+                <stringProp name="Header.name">Content-Type</stringProp>
+                <stringProp name="Header.value">application/x-www-form-urlencoded</stringProp>
+              </elementProp>
+              <elementProp name="Accept-Encoding" elementType="Header">
+                <stringProp name="Header.name">Accept-Encoding</stringProp>
+                <stringProp name="Header.value">gzip, deflate, br</stringProp>
+              </elementProp>
+              <elementProp name="Accept" elementType="Header">
+                <stringProp name="Header.name">Accept</stringProp>
+                <stringProp name="Header.value">*/*</stringProp>
+              </elementProp>
+              <elementProp name="Cookie" elementType="Header">
+                <stringProp name="Header.name">Cookie</stringProp>
+                <stringProp name="Header.value">did=s%3Av0%3A830263b0-74fa-11eb-bacd-e50b61544ecb.2syejQH2ns5jvNVouC7D02CpemEnTuIDxNrEmUr8ksU; did_compat=s%3Av0%3A830263b0-74fa-11eb-bacd-e50b61544ecb.2syejQH2ns5jvNVouC7D02CpemEnTuIDxNrEmUr8ksU</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+          <JSR223PostProcessor guiclass="TestBeanGUI" testclass="JSR223PostProcessor" testname="JSR223 PostProcessor">
+            <stringProp name="scriptLanguage">javascript</stringProp>
+            <stringProp name="parameters"></stringProp>
+            <stringProp name="filename"></stringProp>
+            <stringProp name="cacheKey">true</stringProp>
+            <stringProp name="script">// Get the response body
+var response = prev.getResponseDataAsString();
+
+// Parse JSON
+var json = JSON.parse(response);
+
+// Get the access token
+var accessToken = json.access_token;
+
+// Save for current thread
+vars.put(&quot;access_token&quot;, accessToken);
+
+// Save globally for all Thread Groups
+props.put(&quot;ACCESS_TOKEN&quot;, accessToken);
+
+// Verify in jmeter.log
+log.info(&quot;Access Token: &quot; + accessToken);</stringProp>
+          </JSR223PostProcessor>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Thread Group - v1/create">
+        <intProp name="ThreadGroup.num_threads">1</intProp>
+        <intProp name="ThreadGroup.ramp_time">1</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="HTTP Request">
+          <stringProp name="HTTPSampler.domain">stage-backbone.abc.cimpress.io</stringProp>
+          <stringProp name="HTTPSampler.protocol">https</stringProp>
+          <stringProp name="HTTPSampler.path">/quotes/v1/create</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+    &quot;customerId&quot;: &quot;1540b115-8c1e-44f8-ba5c-5a7451fc24a8&quot;,&#xd;
+    &quot;customerEmail&quot;: &quot;pramy@cimpress.com&quot;,&#xd;
+    &quot;quoteExpiryDate&quot;: &quot;2027-02-20T11:51:19Z&quot;,&#xd;
+    &quot;salesAgent&quot;: &quot;Rahul Verma&quot;,&#xd;
+    &quot;shippingAddress&quot;: {&#xd;
+        &quot;id&quot;: &quot;lEabJQqs&quot;,&#xd;
+        &quot;firstName&quot;: &quot;praveen&quot;,&#xd;
+        &quot;lastName&quot;: &quot;kumar&quot;,&#xd;
+        &quot;streetName&quot;: &quot;Keulenstraat&quot;,&#xd;
+        &quot;streetNumber&quot;: &quot;4-A&quot;,&#xd;
+        &quot;postalCode&quot;: &quot;7418ET&quot;,&#xd;
+        &quot;city&quot;: &quot;Deventer&quot;,&#xd;
+        &quot;country&quot;: &quot;NL&quot;,&#xd;
+        &quot;email&quot;: &quot;pramy@cimpress.com&quot;,&#xd;
+        &quot;custom&quot;: {&#xd;
+            &quot;type&quot;: {&#xd;
+                &quot;typeId&quot;: &quot;type&quot;,&#xd;
+                &quot;id&quot;: &quot;2bfc58d6-a027-4850-bc64-9c238fcb7c00&quot;&#xd;
+            },&#xd;
+            &quot;fields&quot;: {&#xd;
+                &quot;validationDetails&quot;: &quot;{\&quot;validatedOn\&quot;:\&quot;2025-12-03T14:38:04.742Z\&quot;,\&quot;validationSource\&quot;:\&quot;postnl\&quot;,\&quot;mailabilityScore\&quot;:100}&quot;,&#xd;
+                &quot;isValid&quot;: true,&#xd;
+                &quot;createdAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;,&#xd;
+                &quot;lastModifiedAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;&#xd;
+            }&#xd;
+        }&#xd;
+    },&#xd;
+    &quot;billingAddress&quot;: {&#xd;
+        &quot;id&quot;: &quot;lEabJQqs&quot;,&#xd;
+        &quot;firstName&quot;: &quot;praveen&quot;,&#xd;
+        &quot;lastName&quot;: &quot;kumar&quot;,&#xd;
+        &quot;streetName&quot;: &quot;Keulenstraat&quot;,&#xd;
+        &quot;streetNumber&quot;: &quot;4-A&quot;,&#xd;
+        &quot;postalCode&quot;: &quot;7418ET&quot;,&#xd;
+        &quot;city&quot;: &quot;Deventer&quot;,&#xd;
+        &quot;country&quot;: &quot;NL&quot;,&#xd;
+        &quot;email&quot;: &quot;pramy@cimpress.com&quot;,&#xd;
+        &quot;custom&quot;: {&#xd;
+            &quot;type&quot;: {&#xd;
+                &quot;typeId&quot;: &quot;type&quot;,&#xd;
+                &quot;id&quot;: &quot;2bfc58d6-a027-4850-bc64-9c238fcb7c00&quot;&#xd;
+            },&#xd;
+            &quot;fields&quot;: {&#xd;
+                &quot;validationDetails&quot;: &quot;{\&quot;validatedOn\&quot;:\&quot;2025-12-03T14:38:04.742Z\&quot;,\&quot;validationSource\&quot;:\&quot;postnl\&quot;,\&quot;mailabilityScore\&quot;:100}&quot;,&#xd;
+                &quot;isValid&quot;: true,&#xd;
+                &quot;createdAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;,&#xd;
+                &quot;lastModifiedAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;&#xd;
+            }&#xd;
+        }&#xd;
+    },&#xd;
+    &quot;countryCode&quot;: &quot;NL&quot;,&#xd;
+    &quot;fakeQuote&quot;: false,&#xd;
+    &quot;storeId&quot;: &quot;drukwerkdeal-nl&quot;,&#xd;
+    &quot;quoteAcquisitionChannel&quot;: {&#xd;
+        &quot;source&quot;: &quot;cockpit&quot;,&#xd;
+        &quot;referrer_url&quot;: &quot;https://admin.abc.cimpress.io/printdeal-dev/quotes/create/customers/9a629242-5419-4ea8-a56b-168cd069c693/products/e27db698-fc53-463c-ac1d-92db5d7ca115&quot;,&#xd;
+        &quot;source_agent&quot;: &quot;Rahul.Verma@cimpress.com&quot;&#xd;
+    },&#xd;
+    &quot;quoteLineItems&quot;: [&#xd;
+        {&#xd;
+            &quot;merchandisingProductName&quot;: {&#xd;
+                &quot;en&quot;: &quot;(CTP) Banners&quot;,&#xd;
+                &quot;nl&quot;: &quot;(Complete Test Product) Spandoeken&quot;&#xd;
+            },&#xd;
+            &quot;quantity&quot;: 12,&#xd;
+            &quot;userSelection&quot;: {&#xd;
+                &quot;Material&quot;: &quot;Pvc Frontlit&quot;,&#xd;
+                &quot;Banners Finishing&quot;: &quot;No Finishing&quot;,&#xd;
+                &quot;Custom width&quot;: &quot;12&quot;,&#xd;
+                &quot;Custom height&quot;: &quot;12&quot;,&#xd;
+                &quot;Delivery Type&quot;: &quot;Normal&quot;,&#xd;
+                &quot;Printing Process&quot;: &quot;Digital&quot;&#xd;
+            },&#xd;
+            &quot;variableAttributes&quot;: {&#xd;
+                &quot;Artwork Required&quot;: &quot;Yes&quot;,&#xd;
+                &quot;Shippable Pack Dimension 3&quot;: &quot;0&quot;,&#xd;
+                &quot;Custom height&quot;: &quot;12&quot;,&#xd;
+                &quot;Printing Process&quot;: &quot;Digital&quot;,&#xd;
+                &quot;Bleed&quot;: &quot;10 Mm Bleed&quot;,&#xd;
+                &quot;Product has Multiple Panels&quot;: &quot;No&quot;,&#xd;
+                &quot;Material&quot;: &quot;Pvc Frontlit&quot;,&#xd;
+                &quot;Prepress Parameters URL&quot;: &quot;https://readonly.uploads.documents.cimpress.io/v1/uploads/21c67c20-a4f8-4e46-a067-8b9a17c2d289~100?tenant=prepress-uploads&quot;,&#xd;
+                &quot;Type Of Support&quot;: &quot;None&quot;,&#xd;
+                &quot;Finishing&quot;: &quot;Without Luxury Finishing&quot;,&#xd;
+                &quot;Bleed Bottom&quot;: &quot;10&quot;,&#xd;
+                &quot;Orientation&quot;: &quot;Portrait&quot;,&#xd;
+                &quot;Banners Finishing&quot;: &quot;No Finishing&quot;,&#xd;
+                &quot;Production Time&quot;: &quot;3&quot;,&#xd;
+                &quot;Checkmate&quot;: &quot;On&quot;,&#xd;
+                &quot;Split Shipment Allowed&quot;: &quot;Yes&quot;,&#xd;
+                &quot;Printing Colors&quot;: &quot;4/0 Full Color&quot;,&#xd;
+                &quot;InventoryCheck&quot;: &quot;No&quot;,&#xd;
+                &quot;Shippable Pack Quantity&quot;: &quot;1&quot;,&#xd;
+                &quot;Bleed Left&quot;: &quot;10&quot;,&#xd;
+                &quot;Bleed Right&quot;: &quot;10&quot;,&#xd;
+                &quot;Custom width&quot;: &quot;12&quot;,&#xd;
+                &quot;Format&quot;: &quot;Custom Sizes (10 Mm Bleed)&quot;,&#xd;
+                &quot;Bleed Top&quot;: &quot;10&quot;,&#xd;
+                &quot;Delivery Type&quot;: &quot;Normal&quot;,&#xd;
+                &quot;Quantity&quot;: &quot;12&quot;,&#xd;
+                &quot;Shippable Pack Weight&quot;: &quot;7.344&quot;,&#xd;
+                &quot;Shippable Pack Dimension 1&quot;: &quot;12&quot;,&#xd;
+                &quot;Shippable Pack Dimension 2&quot;: &quot;12&quot;&#xd;
+            },&#xd;
+            &quot;custom&quot;: {&#xd;
+                &quot;contentfulPageId&quot;: &quot;6dxedohsoUOrV6MlDSBwPe&quot;&#xd;
+            },&#xd;
+            &quot;shippingAddressPerLineItem&quot;: {&#xd;
+                &quot;id&quot;: &quot;lEabJQqs&quot;,&#xd;
+                &quot;firstName&quot;: &quot;praveen&quot;,&#xd;
+                &quot;lastName&quot;: &quot;kumar&quot;,&#xd;
+                &quot;streetName&quot;: &quot;Keulenstraat&quot;,&#xd;
+                &quot;streetNumber&quot;: &quot;4-A&quot;,&#xd;
+                &quot;postalCode&quot;: &quot;7418ET&quot;,&#xd;
+                &quot;city&quot;: &quot;Deventer&quot;,&#xd;
+                &quot;country&quot;: &quot;NL&quot;,&#xd;
+                &quot;email&quot;: &quot;pramy@cimpress.com&quot;,&#xd;
+                &quot;custom&quot;: {&#xd;
+                    &quot;type&quot;: {&#xd;
+                        &quot;typeId&quot;: &quot;type&quot;,&#xd;
+                        &quot;id&quot;: &quot;2bfc58d6-a027-4850-bc64-9c238fcb7c00&quot;&#xd;
+                    },&#xd;
+                    &quot;fields&quot;: {&#xd;
+                        &quot;validationDetails&quot;: &quot;{\&quot;validatedOn\&quot;:\&quot;2025-12-03T14:38:04.742Z\&quot;,\&quot;validationSource\&quot;:\&quot;postnl\&quot;,\&quot;mailabilityScore\&quot;:100}&quot;,&#xd;
+                        &quot;isValid&quot;: true,&#xd;
+                        &quot;createdAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;,&#xd;
+                        &quot;lastModifiedAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;&#xd;
+                    }&#xd;
+                },&#xd;
+                &quot;quantity&quot;: 12&#xd;
+            },&#xd;
+            &quot;shippingAddresses&quot;: [&#xd;
+                {&#xd;
+                    &quot;id&quot;: &quot;lEabJQqs&quot;,&#xd;
+                    &quot;firstName&quot;: &quot;praveen&quot;,&#xd;
+                    &quot;lastName&quot;: &quot;kumar&quot;,&#xd;
+                    &quot;streetName&quot;: &quot;Keulenstraat&quot;,&#xd;
+                    &quot;streetNumber&quot;: &quot;4-A&quot;,&#xd;
+                    &quot;postalCode&quot;: &quot;7418ET&quot;,&#xd;
+                    &quot;city&quot;: &quot;Deventer&quot;,&#xd;
+                    &quot;country&quot;: &quot;NL&quot;,&#xd;
+                    &quot;email&quot;: &quot;pramy@cimpress.com&quot;,&#xd;
+                    &quot;custom&quot;: {&#xd;
+                        &quot;type&quot;: {&#xd;
+                            &quot;typeId&quot;: &quot;type&quot;,&#xd;
+                            &quot;id&quot;: &quot;2bfc58d6-a027-4850-bc64-9c238fcb7c00&quot;&#xd;
+                        },&#xd;
+                        &quot;fields&quot;: {&#xd;
+                            &quot;validationDetails&quot;: &quot;{\&quot;validatedOn\&quot;:\&quot;2025-12-03T14:38:04.742Z\&quot;,\&quot;validationSource\&quot;:\&quot;postnl\&quot;,\&quot;mailabilityScore\&quot;:100}&quot;,&#xd;
+                            &quot;isValid&quot;: true,&#xd;
+                            &quot;createdAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;,&#xd;
+                            &quot;lastModifiedAt&quot;: &quot;2025-12-03T14:38:04.816Z&quot;&#xd;
+                        }&#xd;
+                    },&#xd;
+                    &quot;quantity&quot;: 12&#xd;
+                }&#xd;
+            ],&#xd;
+            &quot;price&quot;: {&#xd;
+                &quot;currencyCode&quot;: &quot;EUR&quot;,&#xd;
+                &quot;centAmount&quot;: 2906&#xd;
+            },&#xd;
+            &quot;originalProductPrice&quot;: {&#xd;
+                &quot;currencyCode&quot;: &quot;EUR&quot;,&#xd;
+                &quot;centAmount&quot;: 2906&#xd;
+            },&#xd;
+            &quot;productDescription&quot;: {&#xd;
+                &quot;en&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;,&#xd;
+                &quot;nl&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: Zonder afwerking,  Custom width: 12,  Custom height: 12,  Delivery Type: Normaal,  Quantity: 12,  Printing Process: Digital&quot;,&#xd;
+                &quot;fr&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;,&#xd;
+                &quot;nl-NL&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;,&#xd;
+                &quot;nl-BE&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;,&#xd;
+                &quot;fr-BE&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;,&#xd;
+                &quot;fr-FR&quot;: &quot; Material: Pvc Frontlit,  Banners Finishing: No Finishing,  Custom width: 12,  Custom height: 12,  Delivery Type: Normal,  Printing Process: Digital&quot;&#xd;
+            },&#xd;
+            &quot;userComment&quot;: &quot;&quot;,&#xd;
+            &quot;priceOverrideComment&quot;: &quot;&quot;,&#xd;
+            &quot;priceOverrideReason&quot;: &quot;&quot;,&#xd;
+            &quot;variantId&quot;: 1,&#xd;
+            &quot;taxRates&quot;: [&#xd;
+                {&#xd;
+                    &quot;name&quot;: &quot;ATax&quot;,&#xd;
+                    &quot;amount&quot;: 0.21,&#xd;
+                    &quot;country&quot;: &quot;NL&quot;,&#xd;
+                    &quot;state&quot;: null,&#xd;
+                    &quot;subRates&quot;: null,&#xd;
+                    &quot;includedInPrice&quot;: null&#xd;
+                }&#xd;
+            ],&#xd;
+            &quot;productConfigUrl&quot;: &quot;https://cdn-configuration.products.cimpress.io/v1/configurations/a4ed883473373a6b30ca76206451048c9b0e0b068b851b66dadc1041b642fea4&quot;,&#xd;
+            &quot;productionTime&quot;: 0,&#xd;
+            &quot;artworkRequired&quot;: true,&#xd;
+            &quot;productId&quot;: &quot;e27db698-fc53-463c-ac1d-92db5d7ca115&quot;,&#xd;
+            &quot;productKey&quot;: &quot;PRD-MAELPWAL&quot;,&#xd;
+            &quot;mcpSku&quot;: &quot;CIM-RFJCZ27D&quot;,&#xd;
+            &quot;quoteProductType&quot;: &quot;modelled&quot;,&#xd;
+            &quot;MMProductKey&quot;: &quot;PRD-CQGDV1WN8&quot;,&#xd;
+            &quot;MMProductVersion&quot;: 13&#xd;
+        }&#xd;
+    ]&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree>
+          <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+            <collectionProp name="HeaderManager.headers">
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">x-abc-workspace</stringProp>
+                <stringProp name="Header.value">Printdeal</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">x-abc-workspace-env</stringProp>
+                <stringProp name="Header.value">dev</stringProp>
+              </elementProp>
+              <elementProp name="" elementType="Header">
+                <stringProp name="Header.name">Authorization</stringProp>
+                <stringProp name="Header.value">Bearer ${__P(ACCESS_TOKEN)}</stringProp>
+              </elementProp>
+            </collectionProp>
+          </HeaderManager>
+          <hashTree/>
+        </hashTree>
+      </hashTree>
+      <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+        <boolProp name="ResultCollector.error_logging">false</boolProp>
+        <objProp>
+          <name>saveConfig</name>
+          <value class="SampleSaveConfiguration">
+            <time>true</time>
+            <latency>true</latency>
+            <timestamp>true</timestamp>
+            <success>true</success>
+            <label>true</label>
+            <code>true</code>
+            <message>true</message>
+            <threadName>true</threadName>
+            <dataType>true</dataType>
+            <encoding>false</encoding>
+            <assertions>true</assertions>
+            <subresults>true</subresults>
+            <responseData>false</responseData>
+            <samplerData>false</samplerData>
+            <xml>false</xml>
+            <fieldNames>true</fieldNames>
+            <responseHeaders>false</responseHeaders>
+            <requestHeaders>false</requestHeaders>
+            <responseDataOnError>false</responseDataOnError>
+            <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+            <assertionsResultsToSave>0</assertionsResultsToSave>
+            <bytes>true</bytes>
+            <sentBytes>true</sentBytes>
+            <url>true</url>
+            <threadCounts>true</threadCounts>
+            <idleTime>true</idleTime>
+            <connectTime>true</connectTime>
+          </value>
+        </objProp>
+        <stringProp name="filename"></stringProp>
+      </ResultCollector>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
