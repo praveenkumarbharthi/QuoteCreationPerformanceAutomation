@@ -125,12 +125,6 @@ Publish HTML Reports
 | LOOP_COUNT | 5 | Iterations per thread |
 | RAMP_UP | 10 | Ramp-up period in seconds |
 
-### Performance Thresholds
-
-| Metric | Threshold |
-|--------|-----------|
-| Error Rate | < 1% |
-| Average Response Time | < 5000 ms |
 
 ---
 
@@ -164,7 +158,7 @@ The AI report is generated at:
 
 ---
 
-## Future Enhancements
+## Possible Enhancements
 
 - [ ] Email notification with HTML report after each build
 - [ ] Jenkins Performance Plugin for cross-build trend graphs
