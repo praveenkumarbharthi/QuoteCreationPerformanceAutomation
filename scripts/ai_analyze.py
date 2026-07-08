@@ -198,92 +198,246 @@ def call_gemini(api_key, prompt):
 
 
 def generate_html_report(ai_analysis, stats, total_samples, total_failures, environment, build_number, output_path):
-    """Generate a styled HTML report from the AI analysis."""
+    """Generate a modern dashboard-style HTML report from the AI analysis."""
     error_rate = round((total_failures / total_samples) * 100, 2) if total_samples > 0 else 0
-    status_color = '#2ecc71' if error_rate == 0 else '#e74c3c'
-    status_text = 'PASS' if error_rate == 0 else 'FAIL'
+    overall_avg = round(
+        sum(s['avg_ms'] * s['samples'] for s in stats.values()) / total_samples,
+        2
+    ) if total_samples > 0 else 0
+    total_endpoints = len(stats)
+
+    if overall_avg < 500 and error_rate < 1:
+        status_text = 'PASS'
+        status_color = '#22c55e'
+        status_emoji = '🟢'
+    elif overall_avg < 1500 and error_rate < 5:
+        status_text = 'PASS'
+        status_color = '#38bdf8'
+        status_emoji = '🟡'
+    else:
+        status_text = 'FAIL'
+        status_color = '#f97316'
+        status_emoji = '🔴'
+
+    health_score = max(0, min(10, round(10 - error_rate * 0.08 - overall_avg / 1200)))
+    health_grade = 'A' if health_score >= 9 else 'B' if health_score >= 7 else 'C' if health_score >= 5 else 'D'
+    progress_pct = int((health_score / 10) * 100)
+
+    top_endpoints = sorted(stats.items(), key=lambda item: item[1]['avg_ms'], reverse=True)[:5]
+    chart_bars = ''
+    max_avg = max((s['avg_ms'] for _, s in top_endpoints), default=1)
+    for label, s in top_endpoints:
+        width = int((s['avg_ms'] / max_avg) * 100)
+        chart_bars += f"""
+          <div class='chart-row'>
+            <span class='chart-label'>{label}</span>
+            <div class='chart-bar' style='width:{max(4, width)}%'></div>
+            <span class='chart-value'>{s['avg_ms']} ms</span>
+          </div>
+        """
 
     rows = ''
     for label, s in stats.items():
-        health = ''
         avg = s['avg_ms']
         if avg < 500:
-            health = '<span style="color:#2ecc71">Excellent</span>'
+            health_badge = '<span class="badge badge-good">Excellent</span>'
         elif avg < 1500:
-            health = '<span style="color:#f39c12">Good</span>'
+            health_badge = '<span class="badge badge-warning">Good</span>'
         elif avg < 3000:
-            health = '<span style="color:#e67e22">Fair</span>'
+            health_badge = '<span class="badge badge-alert">Fair</span>'
         else:
-            health = '<span style="color:#e74c3c">Poor</span>'
+            health_badge = '<span class="badge badge-bad">Poor</span>'
 
         rows += f"""
         <tr>
           <td>{label}</td>
           <td>{s['samples']}</td>
           <td>{s['error_pct']}%</td>
-          <td>{s['avg_ms']} ms</td>
-          <td>{s['min_ms']} ms</td>
-          <td>{s['max_ms']} ms</td>
+          <td>{avg} ms</td>
           <td>{s['p95_ms']} ms</td>
-          <td>{health}</td>
-        </tr>"""
+          <td>{health_badge}</td>
+        </tr>
+        """
 
-    # Convert AI markdown-style text to HTML
     ai_html = ai_analysis.replace('\n', '<br>').replace('**', '').replace('##', '<h3>').replace('# ', '<h2>')
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>AI Performance Analysis - Build #{build_number}</title>
 <style>
-  body {{ font-family: 'Segoe UI', Arial, sans-serif; background: #0d1117; color: #c9d1d9; margin: 0; padding: 20px; }}
-  h1 {{ color: #58a6ff; border-bottom: 2px solid #30363d; padding-bottom: 10px; }}
-  h2 {{ color: #79c0ff; margin-top: 30px; }}
-  h3 {{ color: #d2a8ff; }}
-  .badge {{ display:inline-block; padding:6px 16px; border-radius:20px; font-weight:bold; font-size:18px; }}
-  .summary-grid {{ display:grid; grid-template-columns: repeat(4,1fr); gap:15px; margin:20px 0; }}
-  .card {{ background:#161b22; border:1px solid #30363d; border-radius:8px; padding:15px; text-align:center; }}
-  .card .value {{ font-size:28px; font-weight:bold; color:#58a6ff; }}
-  .card .label {{ font-size:12px; color:#8b949e; margin-top:5px; }}
-  table {{ width:100%; border-collapse:collapse; margin:20px 0; }}
-  th {{ background:#161b22; color:#8b949e; padding:10px; text-align:left; border-bottom:2px solid #30363d; }}
-  td {{ padding:10px; border-bottom:1px solid #21262d; }}
-  tr:hover td {{ background:#161b22; }}
-  .ai-section {{ background:#161b22; border:1px solid #30363d; border-radius:8px; padding:20px; margin:20px 0; line-height:1.8; }}
-  .footer {{ text-align:center; color:#8b949e; font-size:12px; margin-top:40px; padding-top:20px; border-top:1px solid #30363d; }}
-  .gemini-badge {{ background: linear-gradient(135deg, #4285f4, #34a853); color:white; padding:4px 12px; border-radius:12px; font-size:12px; }}
+  :root {{
+    color-scheme: dark;
+    --bg: #0f172a;
+    --panel: #111827;
+    --panel-strong: #1f2937;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --blue: #38bdf8;
+    --green: #22c55e;
+    --yellow: #facc15;
+    --orange: #fb923c;
+    --red: #f97316;
+    --border: rgba(148, 163, 184, 0.16);
+  }}
+
+  * {{ box-sizing: border-box; }}
+  body {{ margin: 0; min-height: 100vh; background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.1), transparent 28%), var(--bg); color: var(--text); font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif; }}
+  body::before {{ content: ''; position: fixed; inset: 0; background: linear-gradient(135deg, rgba(56,189,248,.06), transparent 45%), linear-gradient(225deg, rgba(34,197,94,.06), transparent 40%); pointer-events: none; }}
+  .page {{ width: min(1200px, 100%); margin: 0 auto; padding: 24px; }}
+  .header {{ display: grid; gap: 20px; margin-bottom: 24px; }}
+  .hero {{ background: var(--panel); border: 1px solid var(--border); border-radius: 24px; padding: 26px; display: flex; justify-content: space-between; align-items: center; gap: 20px; }}
+  .hero-title {{ display: flex; flex-direction: column; gap: 10px; }}
+  .hero-title h1 {{ margin: 0; font-size: clamp(1.8rem, 2.2vw, 2.6rem); letter-spacing: -0.03em; }}
+  .hero-meta {{ color: var(--muted); display: flex; flex-wrap: wrap; gap: 12px; font-size: 0.95rem; }}
+  .hero-status {{ font-size: 1.25rem; font-weight: 700; color: {status_color}; }}
+  .grid-4 {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-bottom: 24px; }}
+  .card {{ background: var(--panel); border: 1px solid var(--border); border-radius: 20px; padding: 20px; }}
+  .metric-title {{ color: var(--muted); font-size: 0.9rem; margin-bottom: 14px; text-transform: uppercase; letter-spacing: .11em; }}
+  .metric-value {{ font-size: 2rem; font-weight: 700; line-height: 1; }}
+  .metric-note {{ color: var(--blue); margin-top: 6px; font-size: 0.95rem; }}
+  .progress-card {{ display: grid; gap: 12px; }}
+  .progress-label {{ display: flex; justify-content: space-between; align-items: center; gap: 12px; color: var(--muted); }}
+  .progress-bar {{ height: 14px; width: 100%; border-radius: 999px; background: rgba(148, 163, 184, 0.12); overflow: hidden; }}
+  .progress-fill {{ height: 100%; width: {progress_pct}%; background: linear-gradient(90deg, #38bdf8, #22c55e); border-radius: 999px; }}
+  .section {{ margin-bottom: 26px; }}
+  .section-header {{ display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }}
+  .section-title {{ font-size: 1.1rem; margin: 0; }}
+  .section-pill {{ padding: 6px 12px; border-radius: 999px; background: rgba(56, 189, 248, 0.16); color: var(--blue); font-size: 0.9rem; }}
+  .panel {{ background: var(--panel); border: 1px solid var(--border); border-radius: 22px; padding: 22px; }}
+  .table-wrap {{ overflow-x: auto; }}
+  table {{ width: 100%; border-collapse: collapse; min-width: 720px; }}
+  th, td {{ padding: 16px; text-align: left; }}
+  th {{ color: var(--muted); font-size: 0.95rem; border-bottom: 1px solid rgba(148,163,184,.12); }}
+  tr:nth-child(even) {{ background: rgba(148,163,184,.03); }}
+  td {{ border-bottom: 1px solid rgba(148,163,184,.08); }}
+  .badge {{ display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; font-size: 0.9rem; font-weight: 600; }}
+  .badge-good {{ background: rgba(34,197,94,.15); color: #22c55e; }}
+  .badge-warning {{ background: rgba(251, 199, 70, .15); color: #facc15; }}
+  .badge-alert {{ background: rgba(251, 146, 60, .15); color: #fb923c; }}
+  .badge-bad {{ background: rgba(249,115,22,.15); color: #f97316; }}
+  .chart-row {{ display: grid; grid-template-columns: 1.4fr 3fr 0.8fr; gap: 12px; align-items: center; margin-bottom: 12px; }}
+  .chart-label {{ color: var(--text); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }}
+  .chart-bar {{ height: 14px; border-radius: 999px; background: linear-gradient(90deg, #38bdf8, #22c55e); }}
+  .chart-value {{ color: var(--muted); font-size: 0.92rem; text-align: right; }}
+  .ai-section {{ background: var(--panel); border: 1px solid var(--border); border-radius: 22px; padding: 24px; line-height: 1.8; }}
+  .ai-section h2 {{ margin-top: 0; color: #8b95a5; }}
+  .ai-section p, .ai-section br {{ color: var(--text); }}
+  .footer {{ text-align:center; font-size: 0.9rem; color: var(--muted); margin-top: 30px; }}
+  @media (max-width: 900px) {{
+    .grid-4 {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+  }}
+  @media (max-width: 640px) {{
+    .grid-4 {{ grid-template-columns: 1fr; }}
+    .hero {{ flex-direction: column; align-items: flex-start; }}
+  }}
 </style>
 </head>
 <body>
-<h1>&#129302; AI Performance Analysis Report
-  <span class="gemini-badge">Powered by Google Gemini</span>
-</h1>
+<div class="page">
+  <div class="header">
+    <div class="hero">
+      <div class="hero-title">
+        <h1>🤖 AI Performance Analysis Report</h1>
+        <div class="hero-meta">
+          <span>Build #{build_number}</span>
+          <span>•</span>
+          <span>{environment.upper()}</span>
+          <span>•</span>
+          <span>{datetime.now().strftime('%b %d, %Y')}</span>
+          <span>•</span>
+          <span>{total_samples} requests</span>
+          <span>•</span>
+          <span>{total_endpoints} endpoints</span>
+        </div>
+      </div>
+      <div class="hero-status">{status_emoji} {status_text}</div>
+    </div>
 
-<div class="summary-grid">
-  <div class="card"><div class="value" style="color:{status_color}">{status_text}</div><div class="label">Build Status</div></div>
-  <div class="card"><div class="value">{total_samples}</div><div class="label">Total Requests</div></div>
-  <div class="card"><div class="value" style="color:{status_color}">{error_rate}%</div><div class="label">Error Rate</div></div>
-  <div class="card"><div class="value">{environment.upper()}</div><div class="label">Environment</div></div>
-</div>
+    <div class="grid-4">
+      <div class="card">
+        <div class="metric-title">Build Status</div>
+        <div class="metric-value">{status_emoji} {status_text}</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Requests</div>
+        <div class="metric-value">{total_samples}</div>
+        <div class="metric-note">Total requests analyzed</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Error Rate</div>
+        <div class="metric-value">{error_rate}%</div>
+        <div class="metric-note">Overall failure percentage</div>
+      </div>
+      <div class="card">
+        <div class="metric-title">Average Response</div>
+        <div class="metric-value">{overall_avg} ms</div>
+        <div class="metric-note">Weighted average across endpoints</div>
+      </div>
+    </div>
+  </div>
 
-<h2>&#128202; Endpoint Statistics</h2>
-<table>
-  <tr>
-    <th>Endpoint</th><th>Samples</th><th>Error %</th>
-    <th>Avg</th><th>Min</th><th>Max</th><th>95th pct</th><th>Health</th>
-  </tr>
-  {rows}
-</table>
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">📊 Health Score</h2>
+      <span class="section-pill">Grade {health_grade}</span>
+    </div>
+    <div class="card progress-card">
+      <div class="progress-label">
+        <span>Overall system health</span>
+        <strong>{health_score} / 10</strong>
+      </div>
+      <div class="progress-bar"><div class="progress-fill"></div></div>
+    </div>
+  </div>
 
-<h2>&#129302; AI Analysis by Google Gemini</h2>
-<div class="ai-section">
-  {ai_html}
-</div>
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">📈 Top Slow Endpoints</h2>
+    </div>
+    <div class="panel">
+      {chart_bars}
+    </div>
+  </div>
 
-<div class="footer">
-  Generated by AI Performance Analyzer | Build #{build_number} | {datetime.now().strftime('%Y-%m-%d %H:%M IST')}<br>
-  Powered by Google Gemini AI (Free Tier) | Apache JMeter + Jenkins CI/CD
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">📊 Endpoint Summary</h2>
+    </div>
+    <div class="panel table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Endpoint</th>
+            <th>Samples</th>
+            <th>Error %</th>
+            <th>Avg</th>
+            <th>P95</th>
+            <th>Health</th>
+          </tr>
+        </thead>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header">
+      <h2 class="section-title">💡 AI Recommendations</h2>
+    </div>
+    <div class="ai-section">
+      {ai_html}
+    </div>
+  </div>
+
+  <div class="footer">
+    Generated by AI Performance Analyzer | Build #{build_number} | {datetime.now().strftime('%Y-%m-%d %H:%M IST')}<br>
+    Powered by Google Gemini AI | Apache JMeter + Jenkins CI/CD
+  </div>
 </div>
 </body>
 </html>"""
