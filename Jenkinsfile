@@ -29,15 +29,10 @@ pipeline {
 
     environment {
         JMETER_HOME = "${WORKSPACE}\\jmeter\\apache-jmeter-5.6.3"
-
         RESULTS_DIR = "${WORKSPACE}\\results"
-
         REPORTS_DIR = "${WORKSPACE}\\reports\\html"
-
         AI_REPORT_DIR = "${WORKSPACE}\\reports\\ai"
-
         ERROR_THRESHOLD = '1'
-
         RESPONSE_THRESHOLD = '5000'
     }
 
@@ -46,6 +41,58 @@ pipeline {
         stage('Checkout Source') {
             steps {
                 checkout scm
+            }
+        }
+
+        stage('Check Jenkins Environment') {
+            steps {
+                bat '''
+                echo ==================================================
+                echo JENKINS ENVIRONMENT
+                echo ==================================================
+
+                echo.
+                echo PATH
+                echo --------------------------------------------------
+                echo %PATH%
+
+                echo.
+                echo PATHEXT
+                echo --------------------------------------------------
+                echo %PATHEXT%
+
+                echo.
+                echo SYSTEMROOT
+                echo --------------------------------------------------
+                echo %SYSTEMROOT%
+
+                echo.
+                echo WINDIR
+                echo --------------------------------------------------
+                echo %WINDIR%
+
+                echo.
+                echo ===== findstr =====
+                where findstr
+
+                echo.
+                echo ===== where =====
+                where where
+
+                echo.
+                echo ===== java =====
+                where java
+                java -version
+
+                echo.
+                echo ===== python =====
+                where python
+                python --version
+
+                echo.
+                echo ===== jmeter =====
+                dir "%JMETER_HOME%\\bin"
+                '''
             }
         }
 
@@ -116,40 +163,29 @@ pipeline {
         stage('Validate Thresholds') {
             steps {
                 script {
-
                     echo "====================================="
                     echo "Performance Thresholds"
                     echo "====================================="
-
                     echo "Error Threshold      : ${ERROR_THRESHOLD}%"
                     echo "Response Threshold   : ${RESPONSE_THRESHOLD} ms"
-
                     echo "Threshold validation completed."
-
                 }
             }
         }
 
         stage('AI Performance Analysis') {
-
             steps {
-
                 withCredentials([
                     string(credentialsId: 'GEMINI_API_KEY', variable: 'GEMINI_API_KEY')
                 ]) {
-
                     bat '''
 
                     if not exist "%WORKSPACE%\\reports\\ai" mkdir "%WORKSPACE%\\reports\\ai"
 
                     set JTL_PATH=%WORKSPACE%\\results\\result.jtl
-
                     set AI_REPORT_PATH=%WORKSPACE%\\reports\\ai\\index.html
-
                     set ENVIRONMENT=%ENVIRONMENT%
-
                     set BUILD_NUMBER=%BUILD_NUMBER%
-
                     set GEMINI_API_KEY=%GEMINI_API_KEY%
 
                     echo ==========================================
@@ -165,9 +201,7 @@ pipeline {
     }
 
     post {
-
         always {
-
             archiveArtifacts(
                 artifacts: 'results/**, reports/**',
                 fingerprint: true
