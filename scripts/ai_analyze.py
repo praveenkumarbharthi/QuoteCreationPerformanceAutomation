@@ -6,6 +6,7 @@ and generates an AI_Performance_Report.html for Jenkins publishing.
 """
 
 import csv
+import inspect
 import os
 import sys
 import json
@@ -84,49 +85,57 @@ def build_prompt(stats, total_samples, total_failures, environment, build_number
     """Build the prompt to send to Gemini."""
     error_rate = round((total_failures / total_samples) * 100, 2) if total_samples > 0 else 0
 
-    summary = f"""
-You are an expert performance engineering analyst. Analyze the following JMeter load test results
-and provide a detailed, professional performance report.
+    important = sorted(
+        stats.items(),
+        key=lambda item: (item[1]["failures"], item[1]["samples"]),
+        reverse=True
+    )[:8]
 
-Build Information:
-- Build Number: {build_number}
-- Environment: {environment}
-- Test Date: {datetime.now().strftime('%Y-%m-%d %H:%M')}
-- Total Requests: {total_samples}
-- Total Failures: {total_failures}
-- Overall Error Rate: {error_rate}%
+    lines = [
+        "You are an expert performance engineering analyst."
+        " Analyze these JMeter results and return one concise report.",
+        f"Build: {build_number}",
+        f"Environment: {environment}",
+        f"Requests: {total_samples}",
+        f"Failures: {total_failures}",
+        f"Error Rate: {error_rate}%",
+        "Endpoint statistics (top 8 by failures/samples):"
+    ]
 
-Endpoint Statistics:
-"""
+    for label, s in important:
+        lines.append(
+            f"{label}: samples={s['samples']}, failures={s['failures']}, "
+            f"avg={s['avg_ms']}ms, p95={s['p95_ms']}ms, error={s['error_pct']}%"
+        )
 
-    for label, s in stats.items():
-        summary += f"""
-Endpoint: {label}
-  Samples     : {s['samples']}
-  Failures    : {s['failures']}
-  Error %     : {s['error_pct']}%
-  Avg (ms)    : {s['avg_ms']}
-  Min (ms)    : {s['min_ms']}
-  Max (ms)    : {s['max_ms']}
-  90th pct    : {s['p90_ms']} ms
-  95th pct    : {s['p95_ms']} ms
-  99th pct    : {s['p99_ms']} ms
-"""
+    lines.extend([
+        "Respond in concise technical bullet points.",
+        "Provide only the requested sections and avoid unnecessary explanation.",
+        "Limit the response to approximately 250 words.",
+        "Sections: EXECUTIVE SUMMARY, APDEX, BOTTLENECKS, BEST PERFORMING APIS, RECOMMENDATIONS, HEALTH SCORE, RISK LEVEL."
+    ])
 
-    summary += """
-Please provide your analysis in the following exact structure:
+    return "\n".join(lines)
 
-1. EXECUTIVE SUMMARY (2-3 sentences overall health assessment)
-2. APDEX ASSESSMENT (rate each endpoint as Excellent/Good/Fair/Poor based on response times)
-3. BOTTLENECKS (list slowest endpoints with specific observations)
-4. BEST PERFORMING APIs (highlight fast, reliable endpoints)
-5. RECOMMENDATIONS (specific, actionable technical improvements for each bottleneck)
-6. OVERALL HEALTH SCORE (score out of 100 with brief justification)
-7. RISK LEVEL (Low/Medium/High with reasoning)
 
-Be specific, technical, and concise. Use bullet points where appropriate.
-"""
-    return summary
+def _invoke_with_args(fn, prompt):
+    try:
+        sig = inspect.signature(fn)
+        kwargs = {}
+        if "prompt" in sig.parameters:
+            kwargs["prompt"] = prompt
+        elif "input" in sig.parameters:
+            kwargs["input"] = prompt
+        if "max_output_tokens" in sig.parameters:
+            kwargs["max_output_tokens"] = 300
+        if "temperature" in sig.parameters:
+            kwargs["temperature"] = 0.2
+        return fn(**kwargs)
+    except Exception:
+        try:
+            return fn(prompt)
+        except Exception:
+            return fn(prompt, 300)
 
 
 def call_gemini(api_key, prompt):
@@ -137,29 +146,37 @@ def call_gemini(api_key, prompt):
         if callable(configure):
             configure(api_key=api_key)
         else:
-            # Some distributions read the API key from env var
             os.environ.setdefault("GOOGLE_API_KEY", api_key)
 
-        # Try the newer/high-level model object if present
         GenerativeModel = getattr(genai, "GenerativeModel", None)
-        if GenerativeModel is not None:
-            model = GenerativeModel("gemini-flash-latest")
-            # Prefer a generate_content-like method if present
-            gen_fn = getattr(model, "generate_content", None) or getattr(model, "generate", None)
-            if callable(gen_fn):
-                resp = gen_fn(prompt)
-                # response may be object-like or dict-like
-                text = getattr(resp, "text", None) or (resp.get("text") if isinstance(resp, dict) else None)
-                if text:
-                    return text
+        model_names = [
+            "gemini-3.1-flash-lite",
+            "gemini-3.5-lite",
+            "gemini-3.0-flash",
+            "gemini-flash-latest"
+        ]
 
-        # Fallback: try module-level convenience functions
+        if GenerativeModel is not None:
+            for model_name in model_names:
+                try:
+                    model = GenerativeModel(model_name)
+                    gen_fn = getattr(model, "generate_content", None) or getattr(model, "generate", None)
+                    if not callable(gen_fn):
+                        continue
+                    resp = _invoke_with_args(gen_fn, prompt)
+                    text = getattr(resp, "text", None) or (resp.get("text") if isinstance(resp, dict) else None)
+                    if text:
+                        return text
+                except Exception:
+                    continue
+
         gen_fn = getattr(genai, "generate_text", None) or getattr(genai, "generate", None)
         if callable(gen_fn):
-            # different versions return different shapes; try to extract a reasonable string
-            resp = gen_fn(prompt=prompt) if 'prompt' in gen_fn.__code__.co_varnames else gen_fn(prompt)
+            try:
+                resp = _invoke_with_args(gen_fn, prompt)
+            except Exception:
+                resp = gen_fn(prompt)
             if isinstance(resp, dict):
-                # common fields: 'candidates', 'outputs', 'text'
                 if "candidates" in resp and isinstance(resp["candidates"], list) and resp["candidates"]:
                     cand = resp["candidates"][0]
                     return cand.get("output") or cand.get("content") or str(cand)
@@ -171,7 +188,6 @@ def call_gemini(api_key, prompt):
 
         raise RuntimeError("No supported google.generativeai API found in the installed package")
     except Exception as e:
-        # Handle quota or API errors gracefully and return a helpful fallback
         print("WARNING: Gemini API call failed:", str(e))
         fallback = (
             "AI analysis unavailable due to Gemini API error.\n"
