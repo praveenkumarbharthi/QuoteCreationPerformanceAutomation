@@ -1,26 +1,45 @@
+# --------------------------
 # JMeter Results
+# --------------------------
 *.jtl
-!results/**/*.jtl
-
-# Logs
+*.csv
 *.log
-!results/**/*.log
 
-# Keep generated report and result folders trackable
-reports/*
-!reports/
-!reports/**
-results/*
+# Keep sample result folders
 !results/
-!results/**
-
-# Keep folder structure
-!reports/.gitkeep
 !results/.gitkeep
 
+# --------------------------
+# Generated Reports
+# --------------------------
+reports/*
+!reports/
+!reports/.gitkeep
+
+# --------------------------
+# Python
+# --------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual Environment
+venv/
+.venv/
+
+# --------------------------
 # VS Code
+# --------------------------
 .vscode/
 
+# --------------------------
 # Windows
+# --------------------------
 Thumbs.db
 Desktop.ini
+
+# --------------------------
+# Environment Variables
+# --------------------------
+.env
+.env.*

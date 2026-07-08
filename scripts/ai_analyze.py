@@ -130,11 +130,55 @@ Be specific, technical, and concise. Use bullet points where appropriate.
 
 
 def call_gemini(api_key, prompt):
-    """Send prompt to Gemini and return the text response."""
-    genai.configure(api_key=api_key)
-    model = genai.GenerativeModel('gemini-1.5-flash')
-    response = model.generate_content(prompt)
-    return response.text
+    # Use the google.generativeai package if available, but access attributes
+    # dynamically to avoid static import/export warnings from type checkers
+    try:
+        configure = getattr(genai, "configure", None)
+        if callable(configure):
+            configure(api_key=api_key)
+        else:
+            # Some distributions read the API key from env var
+            os.environ.setdefault("GOOGLE_API_KEY", api_key)
+
+        # Try the newer/high-level model object if present
+        GenerativeModel = getattr(genai, "GenerativeModel", None)
+        if GenerativeModel is not None:
+            model = GenerativeModel("gemini-flash-latest")
+            # Prefer a generate_content-like method if present
+            gen_fn = getattr(model, "generate_content", None) or getattr(model, "generate", None)
+            if callable(gen_fn):
+                resp = gen_fn(prompt)
+                # response may be object-like or dict-like
+                text = getattr(resp, "text", None) or (resp.get("text") if isinstance(resp, dict) else None)
+                if text:
+                    return text
+
+        # Fallback: try module-level convenience functions
+        gen_fn = getattr(genai, "generate_text", None) or getattr(genai, "generate", None)
+        if callable(gen_fn):
+            # different versions return different shapes; try to extract a reasonable string
+            resp = gen_fn(prompt=prompt) if 'prompt' in gen_fn.__code__.co_varnames else gen_fn(prompt)
+            if isinstance(resp, dict):
+                # common fields: 'candidates', 'outputs', 'text'
+                if "candidates" in resp and isinstance(resp["candidates"], list) and resp["candidates"]:
+                    cand = resp["candidates"][0]
+                    return cand.get("output") or cand.get("content") or str(cand)
+                if "outputs" in resp and isinstance(resp["outputs"], list) and resp["outputs"]:
+                    out = resp["outputs"][0]
+                    return out.get("content") or str(out)
+                return resp.get("text") or json.dumps(resp)
+            return str(resp)
+
+        raise RuntimeError("No supported google.generativeai API found in the installed package")
+    except Exception as e:
+        # Handle quota or API errors gracefully and return a helpful fallback
+        print("WARNING: Gemini API call failed:", str(e))
+        fallback = (
+            "AI analysis unavailable due to Gemini API error.\n"
+            "Error: " + str(e) + "\n\n"
+            "Original prompt (truncated):\n" + (prompt[:3000] + '\n...')
+        )
+        return fallback
 
 
 def generate_html_report(ai_analysis, stats, total_samples, total_failures, environment, build_number, output_path):
